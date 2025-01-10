@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using Microsoft.Extensions.Configuration;
+using ThyUcusArama.Models;
 using ThyUcusArama.Models.GetPortList;
 using ThyUcusArama.Services;
 
@@ -7,13 +9,28 @@ namespace ThyUcusArama.ViewModels
     public class MainPageViewModel : BaseViewModel
     {
         private readonly ThysApi _thysApi;
-        private readonly string _apiKey;
+        private readonly IConfiguration _configuration;
         public ObservableCollection<Port> Ports { get; set; } = new ObservableCollection<Port>();
+        private bool _isLoading;
+        private string _errorMessage;
 
-        public MainPageViewModel()
+        public bool IsLoading
         {
-            _apiKey = "l7xx489657031af74a2b94722ab7f62fb04f";
-            _thysApi = new ThysApi(_apiKey);
+            get => _isLoading;
+            set => SetProperty(ref _isLoading, value);
+        }
+
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set => SetProperty(ref _errorMessage, value);
+        }
+
+        public MainPageViewModel(IConfiguration configuration)
+        {
+            _configuration = configuration;
+            var apiKey = _configuration.GetSection("AppSettings:ApiKey").Value;
+            _thysApi = new ThysApi(apiKey);
 
             LoadPortsAsync().ConfigureAwait(false);
         }
@@ -22,6 +39,9 @@ namespace ThyUcusArama.ViewModels
         {
             try
             {
+                IsLoading = true;
+                ErrorMessage = string.Empty;
+
                 var request = new GetPortListRequest
                 {
                     RequestHeader = new RequestHeader()
@@ -40,11 +60,19 @@ namespace ThyUcusArama.ViewModels
                         }
                     });
                 }
+                else
+                {
+                    ErrorMessage = "Havalimanı listesi alınamadı. Lütfen daha sonra tekrar deneyin.";
+                }
             }
             catch (Exception ex)
             {
+                ErrorMessage = "Bir hata oluştu: " + ex.Message;
                 System.Diagnostics.Debug.WriteLine($"Error loading ports: {ex.Message}");
-                // TODO: Show error to user
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
     }

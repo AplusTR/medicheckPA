@@ -6,18 +6,38 @@
     
     <ScrollView>
         <VerticalStackLayout Spacing="25" Padding="30,0" VerticalOptions="Center">
-            <ListView ItemsSource="{Binding Ports}">
+            <ActivityIndicator IsRunning="{Binding IsLoading}" 
+                             IsVisible="{Binding IsLoading}"
+                             HorizontalOptions="Center" />
+            
+            <Label Text="{Binding ErrorMessage}"
+                   IsVisible="{Binding ErrorMessage, Converter={StaticResource StringNotEmptyConverter}}"
+                   TextColor="Red"
+                   HorizontalOptions="Center" />
+            
+            <ListView ItemsSource="{Binding Ports}"
+                      IsVisible="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <ViewCell>
-                            <StackLayout Orientation="Horizontal" Spacing="10" Padding="10">
-                                <Label Text="{Binding Code}" FontAttributes="Bold" />
-                                <Label Text="{Binding City.LanguageInfo.Language[0].Name}" />
-                            </StackLayout>
+                            <Frame Margin="5" Padding="10">
+                                <StackLayout Orientation="Horizontal" Spacing="10">
+                                    <Label Text="{Binding Code}" 
+                                           FontAttributes="Bold"
+                                           WidthRequest="60" />
+                                    <Label Text="{Binding City.LanguageInfo.Language[0].Name}"
+                                           HorizontalOptions="StartAndExpand" />
+                                </StackLayout>
+                            </Frame>
                         </ViewCell>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+            
+            <Button Text="Yenile"
+                    Command="{Binding RefreshCommand}"
+                    IsEnabled="{Binding IsLoading, Converter={StaticResource InverseBoolConverter}}"
+                    HorizontalOptions="Center" />
         </VerticalStackLayout>
     </ScrollView>
 </ContentPage>
