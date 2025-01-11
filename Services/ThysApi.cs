@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
-using System.Text.Json;
-using ThyUcusArama.Models.GetPortList;
+using System.Net.Http.Json;
+using ThyUcusArama.Models;
 
 namespace ThyUcusArama.Services
 {
@@ -26,8 +26,7 @@ namespace ThyUcusArama.Services
             {
                 var response = await _httpClient.PostAsJsonAsync("v1/getPortList", request);
                 response.EnsureSuccessStatusCode();
-                var content = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<PortListResponse>(content);
+                return await response.Content.ReadFromJsonAsync<PortListResponse>();
             }
             catch (Exception ex)
             {
