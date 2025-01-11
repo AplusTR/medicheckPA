@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using Microsoft.Extensions.Configuration;
 using ThyUcusArama.Models;
-using ThyUcusArama.Models.GetPortList;
 using ThyUcusArama.Services;
 
 namespace ThyUcusArama.ViewModels
